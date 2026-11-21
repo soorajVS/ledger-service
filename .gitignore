@@ -1,0 +1,8 @@
+CLAUDE.md
+*.pem
+.env*
+target/
+.idea/
+*.iml
+*.tfstate*
+.terraform/

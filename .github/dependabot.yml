@@ -1,0 +1,59 @@
+# .github/dependabot.yml
+
+version: 1
+
+updates:
+  # Java/Maven dependencies
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kolkata"
+
+    open-pull-requests-limit: 10
+
+    labels:
+      - "dependencies"
+      - "java"
+
+    groups:
+      patch-and-minor:
+        update-types:
+          - "patch"
+          - "minor"
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kolkata"
+
+    open-pull-requests-limit: 5
+
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+    groups:
+      actions:
+        patterns:
+          - "*"
+  # Docker dependecies
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kolkata"
+
+    open-pull-requests-limit: 5
+
+    labels:
+      - "dependencies"
+      - "docker"
