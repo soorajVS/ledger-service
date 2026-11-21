@@ -1,6 +1,6 @@
 # .github/dependabot.yml
 
-version: 1
+version: 2
 
 updates:
   # Java/Maven dependencies
