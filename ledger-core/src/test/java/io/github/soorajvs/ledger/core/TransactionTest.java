@@ -21,8 +21,8 @@ public class TransactionTest {
 
     @Test
     public void testBalancedTransaction(){
-        Entry entryfrom = new Entry("provider:razorpay", +50000, Currency.getInstance("INR"));
-        Entry entryto = new Entry("customer:42", -50000, Currency.getInstance("INR"));
+        Entry entryfrom = new Entry("provider:razorpay", +50000, INR);
+        Entry entryto = new Entry("customer:42", -50000, INR);
         Transaction transaction = new Transaction(UUID.randomUUID(),
                 "key1", List.of(entryfrom, entryto), Instant.now());
         assertEquals(2, transaction.entries().size());
@@ -32,8 +32,8 @@ public class TransactionTest {
 
     @Test
     public void testUnbalancedTransaction(){
-        Entry entryfrom = new Entry("provider:razorpay", +50000, Currency.getInstance("INR"));
-        Entry entryto = new Entry("customer:42", -40000, Currency.getInstance("INR"));
+        Entry entryfrom = new Entry("provider:razorpay", +50000, INR);
+        Entry entryto = new Entry("customer:42", -40000, INR);
         InvalidTransactionException exception = assertThrows(
                 InvalidTransactionException.class,
                 () -> new Transaction(UUID.randomUUID(),
@@ -45,8 +45,8 @@ public class TransactionTest {
 
     @Test
     public void testMixedCurrencyTransaction(){
-        Entry entryfrom = new Entry("provider:razorpay", +50000, Currency.getInstance("INR"));
-        Entry entryto = new Entry("customer:42", -50000, Currency.getInstance("USD"));
+        Entry entryfrom = new Entry("provider:razorpay", +50000, INR);
+        Entry entryto = new Entry("customer:42", -50000, USD);
         InvalidTransactionException exception = assertThrows(
                 InvalidTransactionException.class,
                 () -> new Transaction(UUID.randomUUID(),
@@ -58,7 +58,7 @@ public class TransactionTest {
 
     @Test
     public void testfewEntries(){
-        Entry entry = new Entry("customer:42", +50000, Currency.getInstance("INR"));
+        Entry entry = new Entry("customer:42", +50000, INR);
         InvalidTransactionException exception = assertThrows(
                 InvalidTransactionException.class,
                 () -> new Transaction(UUID.randomUUID(), "idempotencyKey", List.of(entry), Instant.now())
@@ -68,9 +68,9 @@ public class TransactionTest {
 
     @Test
     public void testZeroAmountTransaction(){
-        Entry entryfrom = new Entry("provider:razorpay", +50000, Currency.getInstance("INR"));
-        Entry entryto = new Entry("customer:42", -50000, Currency.getInstance("INR"));
-        Entry entryZero = new Entry("customer:42", 0, Currency.getInstance("INR"));
+        Entry entryfrom = new Entry("provider:razorpay", +50000, INR);
+        Entry entryto = new Entry("customer:42", -50000, INR);
+        Entry entryZero = new Entry("customer:42", 0, INR);
         InvalidTransactionException exception = assertThrows(
                 InvalidTransactionException.class,
                 () -> new Transaction(UUID.randomUUID(),
@@ -82,8 +82,8 @@ public class TransactionTest {
 
     @Test
     public void testMissingIdempotencyKey(){
-        Entry entryfrom = new Entry("provider:razorpay", +50000, Currency.getInstance("INR"));
-        Entry entryto = new Entry("customer:42", -50000, Currency.getInstance("INR"));
+        Entry entryfrom = new Entry("provider:razorpay", +50000, INR);
+        Entry entryto = new Entry("customer:42", -50000, INR);
         InvalidTransactionException exception = assertThrows(
                 InvalidTransactionException.class,
                 () -> new Transaction(UUID.randomUUID(),
@@ -96,8 +96,8 @@ public class TransactionTest {
 
     @Test
     public void testOverFlow(){
-        Entry entryfrom = new Entry("provider:razorpay", Long.MAX_VALUE - 10, Currency.getInstance("INR"));
-        Entry entryto = new Entry("customer:42", 11, Currency.getInstance("INR"));
+        Entry entryfrom = new Entry("provider:razorpay", Long.MAX_VALUE - 10, INR);
+        Entry entryto = new Entry("customer:42", 11, INR);
         InvalidTransactionException exception = assertThrows(
                 InvalidTransactionException.class,
                 () -> new Transaction(UUID.randomUUID(),
