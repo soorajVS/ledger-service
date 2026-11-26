@@ -50,7 +50,7 @@ public record Transaction(UUID id, String idempotencyKey, List<Entry> entries, I
         return create(idempotencyKey, reverseEntries, clock);
     }
 
-    private long negateExact(long amount){
+    private static long negateExact(long amount){
         try{
             return Math.negateExact(amount);
         }catch (ArithmeticException e){

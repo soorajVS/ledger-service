@@ -17,5 +17,6 @@
   </properties>
   <modules>
     <module>ledger-core</module>
+    <module>ledger-api</module>
   </modules>
 </project>

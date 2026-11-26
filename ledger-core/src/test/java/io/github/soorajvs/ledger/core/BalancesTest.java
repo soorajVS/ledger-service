@@ -7,6 +7,8 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Currency;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +42,7 @@ public class BalancesTest {
         currencyBalance = Balances.of("revenue:subscriptions", List.of(tx1, tx2, tx3));
         assertEquals(-30000, currencyBalance.get(INR));
         currencyBalance = Balances.of("unknown:account", List.of(tx1, tx2, tx3));
-        assertNull(currencyBalance.get(INR));
+        assertTrue(currencyBalance.isEmpty());
     }
 
     @Test
@@ -51,7 +53,7 @@ public class BalancesTest {
         Transaction tx2 = tx("evt_abc789", T2,
                 new Entry("revenue:subscriptions", -50000, INR),
                 new Entry("customer:42:wallet", +50000, INR));
-        Transaction tx3 = tx("evt_abc123", T2,
+        Transaction tx3 = tx("evt_abc999", T2,
                 new Entry("razorpay:receivable", -50000, INR),
                 new Entry("revenue:subscriptions", +50000, INR));
 
@@ -61,6 +63,48 @@ public class BalancesTest {
         assertEquals(0L, currencyBalance.get(INR));
         currencyBalance = Balances.of("revenue:subscriptions", List.of(tx1, tx2, tx3));
         assertEquals(0L, currencyBalance.get(INR));
+    }
+
+    @Test
+    public void balancesAcrossAllAccountsSumToZero() {
+        // Individual accounts are non-zero, but double-entry guarantees the whole ledger nets to zero.
+        List<Transaction> ledger = List.of(
+                tx("evt_topup_1", T1,
+                        new Entry("razorpay:receivable", +50000, INR),
+                        new Entry("customer:42:wallet", -50000, INR)),
+                tx("evt_topup_2", T2,
+                        new Entry("razorpay:receivable", +20000, INR),
+                        new Entry("customer:42:wallet", -20000, INR)),
+                tx("evt_spend_1", T2,
+                        new Entry("customer:42:wallet", +30000, INR),
+                        new Entry("revenue:subscriptions", -30000, INR)),
+                tx("evt_usd_1", T2,
+                        new Entry("stripe:receivable", +1200, USD),
+                        new Entry("customer:42:wallet", -1200, USD)));
+
+        Set<String> accounts = new HashSet<>();
+        ledger.forEach(t -> t.entries().forEach(e -> accounts.add(e.accountId())));
+
+        Map<Currency, Long> total = new HashMap<>();
+        for (String account : accounts) {
+            Balances.of(account, ledger).forEach((currency, amount) -> total.merge(currency, amount, Math::addExact));
+        }
+
+        assertNotEquals(0L, Balances.of("customer:42:wallet", ledger).get(INR));
+        assertEquals(Map.of(INR, 0L, USD, 0L), total);
+    }
+
+    @Test
+    public void shouldThrowNullPointerException() {
+        assertThrows(NullPointerException.class, () -> Balances.of("customer:42:wallet", null));
+    }
+
+    @Test
+    public void shouldThrowNullPointerExceptionforAccount() {
+        Transaction tx1 = tx("evt_abc123", T1,
+                new Entry("razorpay:receivable", +50000, INR),
+                new Entry("customer:42:wallet", -50000, INR));
+        assertThrows(NullPointerException.class, () -> Balances.of(null, List.of(tx1)));
     }
 
 
